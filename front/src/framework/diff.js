@@ -7,14 +7,17 @@
  * @returns {Node} - updated DOM
  */
 function updateAttributes(oldEl, newEl) {
-  // remove attributes that are not in the new element
+  // do nothing if is not an el
+  if (!(oldEl instanceof Element) || !(newEl instanceof Element)) return;
+
+  // remove attribute that are not in new element
   for (let attr of [...oldEl.attributes]) {
     if (!newEl.hasAttribute(attr.name)) {
       oldEl.removeAttribute(attr.name);
     }
   }
-  
-  // add new attribute and update that ones that are changed
+
+  // add new attributes and update the changed ones
   for (let attr of [...newEl.attributes]) {
     if (oldEl.getAttribute(attr.name) !== attr.value) {
       oldEl.setAttribute(attr.name, attr.value);

@@ -11,12 +11,32 @@ import { diff } from './diff.js';
 export function render(root, template) {
   const fragment = htmlToFragment(template());
 
+    if (!fragment) {
+      console.error('Render failed: template returned undefined or null');
+      return;
+    }
+
   // if the root is empty add everything
-  if (!root.firstChild) {
-    root.appendChild(fragment.cloneNode(true));
-  } else {
-    // for the moment this update everything. This part can be improved
-    root.innerHTML = '';
-    root.appendChild(fragment.cloneNode(true));
+   if (!root.firstChild) {
+    // first render
+    while (fragment.firstChild) {
+      root.appendChild(fragment.firstChild);
+    }
+    return;
+  }
+
+  // diff node by node
+  const oldChildren = Array.from(root.childNodes);
+  const newChildren = Array.from(fragment.childNodes);
+  const max = Math.max(oldChildren.length, newChildren.length);
+
+  for (let i = 0; i < max; i++) {
+    if (!oldChildren[i]) {
+      root.appendChild(newChildren[i]);
+    } else if (!newChildren[i]) {
+      oldChildren[i].remove();
+    } else {
+      diff(oldChildren[i], newChildren[i]);
+    }
   }
 }
