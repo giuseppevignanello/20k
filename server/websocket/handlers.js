@@ -6,6 +6,9 @@
 */
 function handleMessage(ws, message, wss) {
   const data = JSON.parse(message);
+
+    console.log('Received:', data);
+    universalBroadcast(wss, data)
 }
 
 /**

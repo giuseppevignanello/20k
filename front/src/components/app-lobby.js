@@ -1,12 +1,26 @@
 import { MiniComponent } from '../framework/component.js';
 import { html } from '../framework/html.js';
+import { socket } from '../services/socket.js';
 
 class AppLobby extends MiniComponent {
   constructor() {
     super();
     this.initState({
-      message: ''
+      message: '',
+      messages: []
     });
+  }
+
+    connectedCallback() {
+    super.connectedCallback(); 
+
+   socket.on('chat:message', (payload) => {
+    this.state.messages = [
+      ...this.state.messages,
+      payload.message
+    ];
+  });
+
   }
 
   template() {
@@ -22,7 +36,9 @@ class AppLobby extends MiniComponent {
           <button type="submit">Send</button>
         </form>
 
-        <p>Message: ${this.state.message}</p>
+        <div>
+          ${this.state.messages.map(m => `<p>${m}</p>`).join('')}
+        </div>
       </div>
     `;
   }
@@ -36,7 +52,7 @@ class AppLobby extends MiniComponent {
     const form = this.shadowRoot.getElementById('messageForm');
     form.onsubmit = (e) => {
       e.preventDefault();
-      console.log('Sent message:', this.state.message);
+      socket.send('chat:message', { message: this.state.message });
     };
   }
 }

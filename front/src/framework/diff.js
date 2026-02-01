@@ -28,6 +28,15 @@ function updateAttributes(oldEl, newEl) {
 export function diff(oldNode, newNode) {
   if (!oldNode) return newNode;
 
+  
+  if (newNode instanceof DocumentFragment) {
+    const fragChildren = [...newNode.childNodes];
+    fragChildren.forEach(child => {
+      oldNode.appendChild(child);
+    });
+    return oldNode;
+  }
+
   // if the node type is changed change the whole node
   if (oldNode.nodeName !== newNode.nodeName) {
     oldNode.replaceWith(newNode);
@@ -44,19 +53,20 @@ export function diff(oldNode, newNode) {
   updateAttributes(oldNode, newNode);
 
   // recursive diffe on each child
-  const oldChildren = oldNode.childNodes;
-  const newChildren = newNode.childNodes;
+  const oldChildren = Array.from(oldNode.childNodes);
+  const newChildren = Array.from(newNode.childNodes); // a copy, not the live NodeList, so it doesn't lost childrens
   const max = Math.max(oldChildren.length, newChildren.length);
 
   for (let i = 0; i < max; i++) {
-    if (!oldChildren[i]) {
-      oldNode.appendChild(newChildren[i]);
-    } else if (!newChildren[i]) {
+    if (!oldChildren[i] && newChildren[i]) {
+      oldNode.appendChild(newChildren[i].cloneNode(true)); 
+    } else if (!newChildren[i] && oldChildren[i]) {
       oldChildren[i].remove();
-    } else {
+    } else if (oldChildren[i] && newChildren[i]) {
       diff(oldChildren[i], newChildren[i]);
     }
   }
+
 
   return oldNode;
 }

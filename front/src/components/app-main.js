@@ -15,7 +15,6 @@ class AppMain extends MiniComponent {
     return html`
       <app-header></app-header>
       <app-lobby></app-lobby>
-      <button id="toggle">Toggle Header</button>
     `;
   }
 

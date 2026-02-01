@@ -5,6 +5,6 @@ const server = http.createServer();
 
 initWebSocket(server); 
 
-server.listenerCount(8080, () => {
-
-})
+server.listen(8080, () => {
+  console.log('HTTP + WS server on http://localhost:8080');
+});

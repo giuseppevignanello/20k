@@ -1,4 +1,3 @@
-import { htmlToFragment } from './html.js';
 import { diff } from './diff.js';
 
 /**
@@ -9,7 +8,7 @@ import { diff } from './diff.js';
  * @param {Function} template - function that return a HTML string
  */
 export function render(root, template) {
-  const fragment = htmlToFragment(template());
+  const fragment = template();
 
     if (!fragment) {
       console.error('Render failed: template returned undefined or null');

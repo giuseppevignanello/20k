@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const {handleMessage, handleClose} = require('./handlers');
 
 module.exports = function initWebSocket(server) {
   const wss = new WebSocket.Server({ server });
