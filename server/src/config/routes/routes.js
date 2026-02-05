@@ -1,5 +1,5 @@
-const { router } = require('./router'); 
-const { createRoom, joinRoom } = require('../controllers/rooms.controller'); 
+const { router } = require('./router');
+const { createRoom, showRoom } = require('../controllers/rooms.controller');
 
 router.post('/rooms', createRoom); 
-router.post('/rooms/join', joinRoom);
+router.get('/rooms/:id', showRoom);

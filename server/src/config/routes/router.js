@@ -1,20 +1,42 @@
 const routes = []; 
 
+function get(path, handler){
+    routes.push({method: 'GET', path, handler})
+}
+
 function post(path, handler) {
     routes.push({method: 'POST', path, handler});
 }
 
-function handle(req, res) {
-    const route = routes.find(
-        r => r.method === req.method && r.path === req.url
-    ); 
+function matchRoute(routePath, url) {
+  const routeParts = routePath.split('/');
+  const urlParts = url.split('/');
+  if (routeParts.length !== urlParts.length) return false;
 
-    if(!route) {
-        res.writeHead(404); 
-        return res.end('Not Found'); 
+  const params = {};
+  for (let i = 0; i < routeParts.length; i++) {
+    if (routeParts[i].startsWith(':')) {
+      params[routeParts[i].slice(1)] = urlParts[i];
+    } else if (routeParts[i] !== urlParts[i]) {
+      return false;
     }
-
-    route.handler(req, res);
+  }
+  return params; // return object if matched, false otherwise
 }
 
-exports.router = {post, handle};
+function handle(req, res) {
+  console.log(req, res)
+  for (const r of routes) {
+    if (r.method !== req.method) continue;
+    const params = matchRoute(r.path, req.url);
+    if (params !== false) {
+      req.params = params;
+      return r.handler(req, res);
+    }
+  }
+  res.writeHead(404);
+  res.end('Not Found');
+}
+
+
+exports.router = {get, post, handle};

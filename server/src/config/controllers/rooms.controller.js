@@ -1,5 +1,7 @@
 const { parseBody } = require('../utils/bodyParser'); 
 const crypto = require('crypto');
+const path = require('path');
+const fs = require('fs');
 
 const rooms = new Map(); 
 
@@ -20,7 +22,30 @@ function createRoom(req, res) {
     res.end(JSON.stringify({ roomId }));
 }
 
+
 /**
+ * 
+ * This function only redirect to the front end. 
+ * It is the FE that handle the join with WS
+ * @param {import('http').IncomingMessage} req 
+ * @param {import('http').ServerResponse} res 
+ */
+function showRoom(req, res) {
+  const filePath = path.join(__dirname, '../front/index.html');
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      res.writeHead(500);
+      return res.end('Error loading index.html');
+    }
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(data);
+  });
+}
+
+
+
+/**
+ * Maybe we depracate this
  * Join the room
  * @param {import('http').IncomingMessage} req 
  * @param {import('http').ServerResponse} res
@@ -46,4 +71,9 @@ async function joinRoom(req, res) {
     }
 }
 
-module.exports = { createRoom, joinRoom, rooms }; 
+module.exports = { 
+    createRoom,
+    showRoom, 
+    joinRoom, 
+    rooms 
+}; 
