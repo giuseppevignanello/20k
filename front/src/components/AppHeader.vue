@@ -9,7 +9,7 @@ export default {
   name: 'AppHeader',
   data() {
     return {
-      title: '20kkkkk',
+      title: '20k',
     }
   },
 
