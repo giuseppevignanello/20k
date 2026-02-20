@@ -1,15 +1,15 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 
-const socket = new WebSocket('ws://localhost:3000');
+const url = import.meta.env.VITE_BASE_WS_URL || 'ws://localhost:3000';
+
+const socket = new WebSocket(url);
 
 socket.addEventListener('open', () => {
-  console.log('Connected to WebSocket server');
   socket.send('Hello from the frontend!');
 });
 
 socket.addEventListener('message', (event) => {
-  console.log('Message from server:', event.data);
 });
 
 createApp(App).mount('#app');
