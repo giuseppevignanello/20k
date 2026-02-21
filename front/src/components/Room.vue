@@ -10,38 +10,34 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { socket } from '../socket';
 
 export default {
   name: 'Room',
   setup() {
     const players = ref([]);
 
-    let socket;
+    const handleSocketMessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'PLAYER_JOINED') {
+        players.value = data.payload.players;      }
+    };
+
+    const handleSocketError = (error) => {
+      console.error('WebSocket error:', error);
+    };
 
     onMounted(() => {
-      socket = new WebSocket(import.meta.env.VITE_BASE_WS_URL || 'ws://localhost:3000');
+      // Attach WebSocket event listeners
+      socket.addEventListener('message', handleSocketMessage);
+      socket.addEventListener('error', handleSocketError);
+    });
 
-      socket.onopen = () => {
-        console.log('WebSocket connection established for Room');
-      };
-
-      socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        if (data.type === 'PLAYER_JOINED') {
-          console.log('Player joined:', data.payload.playerName);
-          players.value.push({ id: players.value.length + 1, name: data.payload.playerName });
-        }
-      };
-
-      socket.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-
-      socket.onclose = () => {
-        console.log('WebSocket connection closed');
-      };
+    onBeforeUnmount(() => {
+      // Detach WebSocket event listeners
+      socket.removeEventListener('message', handleSocketMessage);
+      socket.removeEventListener('error', handleSocketError);
     });
 
     return {

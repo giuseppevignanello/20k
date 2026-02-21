@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import config from '../../config';
+import { socket, sendMessage } from '../../socket';
 
 export default {
     name: 'JoinRoomModal',
@@ -28,32 +28,36 @@ export default {
     },
     methods: {
         joinRoom() {
-            const socket = new WebSocket(config.wsBaseUrl);
-
-            socket.onopen = () => {
-                socket.send(
-                    JSON.stringify({
-                        type: 'join-room',
-                        roomUuid: this.roomUuid,
-                        playerName: this.playerName
-                    })
-                );
+            const payload = {
+                type: 'join-room',
+                roomUuid: this.roomUuid,
+                playerName: this.playerName
             };
 
-            socket.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'room-details') {
-                    console.log('Joined room successfully!', data);
-                    this.$emit('joined', data);
-                } else if (data.error) {
-                    console.error('Error joining room:', data.error);
-                }
-            };
+            // Use the global sendMessage function
+            sendMessage(payload);
 
-            socket.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            };
+            // Attach WebSocket event listeners
+            socket.addEventListener('message', this.handleSocketMessage);
+            socket.addEventListener('error', this.handleSocketError);
+        },
+        handleSocketMessage(event) {
+            const data = JSON.parse(event.data);
+            if (data.type === 'room-details') {
+                console.log('Joined room successfully!', data);
+                this.$emit('joined', data);
+            } else if (data.error) {
+                console.error('Error joining room:', data.error);
+            }
+        },
+        handleSocketError(error) {
+            console.error('WebSocket error:', error);
         }
+    },
+    beforeDestroy() {
+        // Detach WebSocket event listeners
+        socket.removeEventListener('message', this.handleSocketMessage);
+        socket.removeEventListener('error', this.handleSocketError);
     }
 };
 </script>
