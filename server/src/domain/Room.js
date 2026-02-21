@@ -1,14 +1,16 @@
 class Room {
     static DEFAULT_NUMBER_OF_PLAYERS = 4;
+    static DEFAULT_MAX_POINTS = 20;
     /**
      * Room entity represents a game room where players can join.
      * It manages the list of players and checks if the room is complete.
      * @param {string} id 
      * @param {number} maxPlayers 
      */
-  constructor(id, maxPlayers = Room.DEFAULT_NUMBER_OF_PLAYERS) {
+  constructor(id, maxPoints = Room.DEFAULT_MAX_POINTS, maxPlayers = Room.DEFAULT_NUMBER_OF_PLAYERS) {
     this.id = id;
     this.players = [];
+    this.maxPoints = maxPoints;
     this.maxPlayers = maxPlayers;
   }
 

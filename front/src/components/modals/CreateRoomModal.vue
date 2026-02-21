@@ -17,7 +17,7 @@
         <button type="submit">Create</button>
     </form>
     <div>
-        <p v-if="roomUuid"> Room UUID: {{ roomUuid }}</p>
+        <p v-if="roomUuid"> Room ID: {{ roomUuid }}</p>
     </div>
 </div>
 </template>
@@ -43,7 +43,7 @@ export default {
             })
             .then(response => {     
                 console.log('Room created successfully:', response.data);
-                this.roomUuid = response.data.uuid;           
+                this.roomUuid = response.data.roomId;           
             })
         }
     }

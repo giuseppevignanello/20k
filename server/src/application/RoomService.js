@@ -1,23 +1,36 @@
+import { v4 as uuidv4 } from 'uuid';
+import Room from "../domain/Room.js";
 import WebSocketAdapter from "../infrastructure/WebSocketAdapter.js";
+import Player from '../domain/Player.js';
 
 class RoomService {
+  
+  rooms = {};
   /**
    * RoomService is responsible for managing game rooms, including adding players and broadcasting updates.
    * Todo: use an actual repository instead of an in-memory one, and inject it here.
+   * ROOM_FULL: means that the room has reached its maximum player capacity and cannot accept more players.
+   * ROOM_COMPLETE: indicates that the room has reached the required number of players and is ready to start the game.
    * @param {WebSocketAdapter} webSocketAdapter 
    */  
   constructor(webSocketAdapter) {
     this.webSocketAdapter = webSocketAdapter;
   }
 
-  createRoom(maxPoints, maxPlayers) {
-    const roomId = uuidv4();
-    this.roomRepository.createRoom(roomId, maxPoints, maxPlayers);
-    return roomId;
+  getRoom(roomUuid) {
+    return this.rooms[roomUuid];
   }
 
-  addPlayerToRoom(roomId, player) {
-    const room = this.roomRepository.getRoomById(roomId);
+  createRoom(maxPoints, maxPlayers) {
+    const roomUuid = uuidv4();
+
+    this.rooms[roomUuid] = new Room(roomUuid, maxPoints, maxPlayers);
+    return roomUuid;
+  }
+
+  addPlayerToRoom(roomUuid, playerName, socket) {
+    const room = this.rooms[roomUuid];
+
     if (!room) {
       throw new Error('Room not found.');
     }
@@ -26,25 +39,30 @@ class RoomService {
       throw new Error('Room is full.');
     }
 
-    if (room.players.includes(playerName)) {
+    if (room.players.some(player => player.name === playerName)) {
       throw new Error('Player already in the room.');
     }
 
-    
+    const player = new Player(playerName, socket);
     room.addPlayer(player);
 
-    this.webSocketAdapter.broadcastToRoom(roomId, {
+    // Broadcast the updated player list to the room
+    this.webSocketAdapter.broadcastToRoom(room, {
       type: 'PLAYER_JOINED',
       payload: { players: room.getPlayers() },
     });
 
     // Check if the room is complete
     if (room.isComplete()) {
-      this.webSocketAdapter.broadcastToRoom(roomId, {
+      this.webSocketAdapter.broadcastToRoom(roomUuid, {
         type: 'ROOM_COMPLETE',
         payload: { message: 'Room is complete. Game can start!' },
       });
     }
+  }
+
+  setWebSocketAdapter(adapter) {
+    this.webSocketAdapter = adapter;
   }
 }
 

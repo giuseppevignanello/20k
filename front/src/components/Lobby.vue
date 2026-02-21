@@ -6,7 +6,7 @@
 
         <!-- Modals -->
         <CreateRoomModal v-if="showCreateRoomModal" @close="showCreateRoomModal = false" />
-        <JoinRoomModal v-if="showJoinRoomModal" @close="showJoinRoomModal = false" />
+        <JoinRoomModal v-if="showJoinRoomModal" @close="showJoinRoomModal = false" @joined="emitJoinRoom" />
     </div>
 
 </template>
@@ -32,6 +32,9 @@ export default {
     },
     openJoinRoomModal() {
       this.showJoinRoomModal = true;
+    },
+    emitJoinRoom() {
+      this.$emit('join-room');
     }
   },
 };

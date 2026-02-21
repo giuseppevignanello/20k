@@ -1,4 +1,11 @@
+import RoomService from "../application/RoomService.js";
+
 class RoomsController {
+  
+  /**
+   * 
+   * @param {RoomService} roomService 
+   */
   constructor(roomService) {
     this.roomService = roomService;
   }
@@ -18,20 +25,32 @@ class RoomsController {
     }
   }
 
-  joinRoom(req, res) {
-    const { roomName, playerName } = req.body;
+  joinRoom(socket, message) {
+    const { roomUuid, playerName } = message;
 
-    if (!roomName || !playerName) {
-      return res.status(400).json({ error: 'Room name and player name are required.' });
+    if (!playerName) {
+      return socket.send(JSON.stringify({ error: 'Player name is required.' }));kw
     }
 
     try {
-      const players = this.roomService.addPlayerToRoom(roomName, playerName);
-      res.status(200).json({ message: 'Joined room successfully.', roomName, players });
+      // Add player to the room and associate WebSocket
+      this.roomService.addPlayerToRoom(roomUuid, playerName, socket);
+
+      const room = this.roomService.getRoom(roomUuid);
+      socket.send(
+        JSON.stringify({
+          type: "room-details", 
+          roomUuid, 
+          players: room.players, 
+          maxPlayers: room.maxPlayers,
+          maxPoints: room.maxPoints
+        })
+      );
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      socket.send(JSON.stringify({ error: error.message }));
     }
   }
+
 }
 
 export default RoomsController;
