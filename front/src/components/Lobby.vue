@@ -33,8 +33,8 @@ export default {
     openJoinRoomModal() {
       this.showJoinRoomModal = true;
     },
-    emitJoinRoom() {
-      this.$emit('join-room');
+    emitJoinRoom(data) {
+      this.$emit('join-room', data);
     }
   },
 };

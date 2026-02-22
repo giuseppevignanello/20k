@@ -44,7 +44,6 @@ export default {
         handleSocketMessage(event) {
             const data = JSON.parse(event.data);
             if (data.type === 'room-details') {
-                console.log('Joined room successfully!', data);
                 this.$emit('joined', data);
             } else if (data.error) {
                 console.error('Error joining room:', data.error);

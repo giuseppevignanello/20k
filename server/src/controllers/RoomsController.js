@@ -43,7 +43,8 @@ class RoomsController {
           roomUuid, 
           players: room.players, 
           maxPlayers: room.maxPlayers,
-          maxPoints: room.maxPoints
+          maxPoints: room.maxPoints, 
+          currentPlayerName: playerName
         })
       );
     } catch (error) {

@@ -41,18 +41,6 @@ class WebSocketAdapter {
       }
     });
   }
-
-  getClientConnection(playerName) {
-    console.log(this.rooms);
-    for (const [roomId, clients] of this.rooms.entries()) {
-      for (const client of clients) {
-        if (client.playerName === playerName) {
-          return client;
-        }
-      }
-    }
-    return null;
-  }
 }
 
 export default WebSocketAdapter;

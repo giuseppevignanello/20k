@@ -42,7 +42,6 @@ export default {
                 maxPoints: this.maxPoints,
             })
             .then(response => {     
-                console.log('Room created successfully:', response.data);
                 this.roomUuid = response.data.roomId;           
             })
         }
