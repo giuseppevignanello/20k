@@ -1,23 +1,30 @@
 <template>
   <div class="room">
-    <div class="players-container">
-      <div
-        v-for="(player, index) in orderedPlayers"
-        :key="player.id"
-        class="player"
-        :style="getPlayerPosition(index, orderedPlayers.length)"
-      >
-        {{ player.name }}
-      </div>
+    <div v-if="phase === 'dealer-selection'">
+      <CardDistribution :players="players" :distributionOrder="distributionOrder" />
+    </div>
+    <div class="players-container" v-else>
+        <Player
+          v-for="(player, index) in orderedPlayers"
+          :key="player.id"
+          :player="player"
+          :position="getPlayerPosition(index, orderedPlayers.length)"
+        />
     </div>
   </div>
 </template>
 
 <script>
 import { socket } from '../socket';
+import Player from './Player.vue';
+import CardDistribution from './CardDistribution.vue';
 
 export default {
   name: 'Room',
+  components: {
+    Player,
+    CardDistribution,
+  },
   props: {
     roomData: {
       type: Object,
@@ -28,6 +35,8 @@ export default {
     return {
       players: this.roomData.players || [], 
       currentPlayerName: this.roomData.currentPlayerName,
+      phase: 'waiting',
+      distributionOrder: [],
     };
   },
   computed: {
@@ -46,6 +55,10 @@ export default {
       const data = JSON.parse(event.data);
       if (data.type === 'PLAYER_JOINED') {
         this.players = data.payload.players; 
+      }
+      if (data.type === 'ROOM_COMPLETE') {
+        this.phase = 'dealer-selection';
+        this.distributionOrder = data.payload.distributionOrder;
       }
     },
     handleSocketError(error) {
@@ -87,17 +100,4 @@ export default {
   height: 70%;
 }
 
-.player {
-  position: absolute;
-  text-align: center;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 50%;
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-}
 </style>

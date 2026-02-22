@@ -1,17 +1,15 @@
+import Deck from '../domain/Deck.js';
+
 class Room {
-    static DEFAULT_NUMBER_OF_PLAYERS = 4;
-    static DEFAULT_MAX_POINTS = 20;
-    /**
-     * Room entity represents a game room where players can join.
-     * It manages the list of players and checks if the room is complete.
-     * @param {string} id 
-     * @param {number} maxPlayers 
-     */
+  static DEFAULT_NUMBER_OF_PLAYERS = 4;
+  static DEFAULT_MAX_POINTS = 20;
+
   constructor(id, maxPoints = Room.DEFAULT_MAX_POINTS, maxPlayers = Room.DEFAULT_NUMBER_OF_PLAYERS) {
     this.id = id;
     this.players = [];
     this.maxPoints = maxPoints;
     this.maxPlayers = maxPlayers;
+    this.deck = new Deck();
   }
 
   addPlayer(player) {
@@ -26,11 +24,20 @@ class Room {
   }
 
   isComplete() {
-    return this.players.length === this.maxPlayers;
+    return this.players.length == this.maxPlayers;
   }
 
   getPlayers() {
     return this.players;
+  }
+
+  startDealerSelection() {
+    if (!this.isComplete()) {
+      throw new Error('Room is not complete');
+    }
+
+    const dealer = this.deck.deal(this.players);
+    return dealer;
   }
 }
 

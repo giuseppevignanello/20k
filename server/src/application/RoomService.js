@@ -54,9 +54,18 @@ class RoomService {
 
     // Check if the room is complete
     if (room.isComplete()) {
-      this.webSocketAdapter.broadcastToRoom(roomUuid, {
+      const dealer = room.startDealerSelection();
+      this.webSocketAdapter.broadcastToRoom(room, {
         type: 'ROOM_COMPLETE',
-        payload: { message: 'Room is complete. Game can start!' },
+        payload: {
+          message: 'Room is complete. Game can start!',
+          players: room.getPlayers(),
+          distributionOrder: room.players.map(player => ({
+            id: player.id,
+            name: player.name,
+            cards: player.cards,
+          })),
+        },
       });
     }
   }
