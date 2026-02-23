@@ -57,6 +57,7 @@ export default {
         this.players = data.payload.players; 
       }
       if (data.type === 'ROOM_COMPLETE') {
+        console.log('Room is complete, starting dealer selection');
         this.phase = 'dealer-selection';
         this.distributionOrder = data.payload.distributionOrder;
       }

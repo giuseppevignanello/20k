@@ -28,9 +28,6 @@ export default {
       required: true,
     },
   },
-  mounted() {
-    console.log('CardDistribution mounted with distributionOrder:', this.distributionOrder);
-  },
 };
 </script>
 

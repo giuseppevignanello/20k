@@ -35,18 +35,7 @@ class RoomsController {
     try {
       // Add player to the room and associate WebSocket
       this.roomService.addPlayerToRoom(roomUuid, playerName, socket);
-
-      const room = this.roomService.getRoom(roomUuid);
-      socket.send(
-        JSON.stringify({
-          type: "room-details", 
-          roomUuid, 
-          players: room.players, 
-          maxPlayers: room.maxPlayers,
-          maxPoints: room.maxPoints, 
-          currentPlayerName: playerName
-        })
-      );
+      
     } catch (error) {
       socket.send(JSON.stringify({ error: error.message }));
     }

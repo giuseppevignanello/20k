@@ -46,6 +46,17 @@ class RoomService {
     const player = new Player(playerName, socket);
     room.addPlayer(player);
 
+    socket.send(
+      JSON.stringify({
+        type: "room-details", 
+        roomUuid, 
+        players: room.players, 
+        maxPlayers: room.maxPlayers,
+        maxPoints: room.maxPoints, 
+        currentPlayerName: playerName
+      })
+    );
+
     // Broadcast the updated player list to the room
     this.webSocketAdapter.broadcastToRoom(room, {
       type: 'PLAYER_JOINED',
@@ -67,7 +78,9 @@ class RoomService {
           })),
         },
       });
+      return;
     }
+
   }
 
   setWebSocketAdapter(adapter) {
